@@ -1,11 +1,11 @@
-# YouTube Summarizer — Gemini Powered
+# YouTube Summarizer — Groq Powered
 
-![Python](https://img.shields.io/badge/Python-3.10-blue)
+![Python](https://img.shields.io/badge/Python-3.13-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.35-red)
-![Gemini](https://img.shields.io/badge/Gemini-1.5_Flash-green)
+![Groq](https://img.shields.io/badge/Groq-Llama_3.3_70B-orange)
 
 ## 📌 Deskripsi
-AI-powered YouTube video summarizer. Extract transcript otomatis → Gemini rangkum jadi ringkasan + key points + actionable takeaway.
+AI-powered YouTube video summarizer. Extract transcript otomatis → Groq (Llama 3.3 70B) rangkum jadi ringkasan + key points + actionable takeaway.
 
 ## 🎯 Fitur
 - Extract transcript dari URL YouTube
@@ -14,12 +14,13 @@ AI-powered YouTube video summarizer. Extract transcript otomatis → Gemini rang
 - Streamlit UI minimal
 
 ## 🛠️ Tech Stack
-- Python, Streamlit, YouTube Transcript API, Gemini API
+- Python, Streamlit, YouTube Transcript API, Groq (Llama 3.3 70B)
 
 ## 🚀 Cara Menjalankan
 
 ```bash
-$env:GEMINI_API_KEY="AQ....YOUR_KEY_HERE...."
+# Ambil API key gratis di https://console.groq.com/keys
+$env:GROQ_API_KEY="gsk_....YOUR_KEY_HERE...."
 pip install -r requirements.txt
 streamlit run app.py
 ```
@@ -27,7 +28,7 @@ streamlit run app.py
 ## 📊 Key Insight
 - 80% video edukasi 30+ menit bisa dirangkum dalam 10 bullet points
 - Transcript API gratis, nggak perlu download video
-- Gemini 1.5 Flash handle 15K token transcript dengan mudah
+- Groq inference super cepat (ratusan token/detik) untuk transcript 6000+ kata
 
 ## 👤 Author
 [Avatar Putra Sigit](https://linkedin.com/in/avatarputrasigit) — Founder & CEO @AVA.Group

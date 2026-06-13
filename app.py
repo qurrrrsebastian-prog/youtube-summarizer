@@ -1,17 +1,17 @@
-"""YouTube Summarizer with Gemini. Author: Avatar Putra Sigit"""
+"""YouTube Summarizer with Groq (Llama 3.3 70B). Author: Avatar Putra Sigit"""
 import os
 import sys
 import re
 import streamlit as st
 from youtube_transcript_api import YouTubeTranscriptApi
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 
-def get_llm() -> ChatGoogleGenerativeAI:
-    key = os.environ.get("GEMINI_API_KEY")
+def get_llm() -> ChatGroq:
+    key = os.environ.get("GROQ_API_KEY")
     if not key:
-        st.error("GEMINI_API_KEY not found.")
+        st.error("GROQ_API_KEY not found.")
         sys.exit(1)
-    return ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=key, temperature=0.3)
+    return ChatGroq(model="llama-3.3-70b-versatile", api_key=key, temperature=0.3)
 
 def extract_video_id(url: str) -> str | None:
     """Extract YouTube video ID from URL."""
@@ -27,15 +27,24 @@ def extract_video_id(url: str) -> str | None:
     return None
 
 def get_transcript(video_id: str) -> str:
-    """Fetch transcript from YouTube."""
+    """Fetch transcript from YouTube (youtube-transcript-api >= 1.0)."""
+    api = YouTubeTranscriptApi()
+    # 1) Coba bahasa yang diinginkan dulu
     try:
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=["id", "en"])
-        return " ".join([t["text"] for t in transcript])
+        fetched = api.fetch(video_id, languages=["id", "en"])
+        return " ".join(snippet.text for snippet in fetched)
+    except Exception:
+        pass
+    # 2) Fallback: pakai transcript apa pun yang tersedia
+    try:
+        transcript = next(iter(api.list(video_id)))
+        fetched = transcript.fetch()
+        return " ".join(snippet.text for snippet in fetched)
     except Exception as e:
         return f"Error: {e}"
 
-def summarize(text: str, llm: ChatGoogleGenerativeAI) -> str:
-    """Summarize transcript with Gemini."""
+def summarize(text: str, llm: ChatGroq) -> str:
+    """Summarize transcript with Groq."""
     prompt = f"""Summarize this YouTube video transcript in Indonesian. Provide:
 1) Ringkasan singkat (3 kalimat),
 2) 5 Key Points (bullet),
@@ -47,7 +56,7 @@ Transcript: {text[:15000]}"""
 
 def main() -> None:
     st.set_page_config(page_title="YouTube Summarizer", layout="wide")
-    st.title("📺 YouTube Summarizer — Gemini Powered")
+    st.title("📺 YouTube Summarizer — Groq Powered")
     st.markdown("Paste link video → AI rangkum jadi key insights")
 
     url = st.text_input("🔗 URL YouTube:", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
@@ -62,7 +71,7 @@ def main() -> None:
                 st.error(transcript)
                 return
             st.success(f"Transcript fetched: {len(transcript.split())} words")
-        with st.spinner("Summarizing with Gemini..."):
+        with st.spinner("Summarizing with Groq..."):
             llm = get_llm()
             summary = summarize(transcript, llm)
             st.subheader("📝 Summary")
